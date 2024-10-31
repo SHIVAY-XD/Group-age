@@ -1,4 +1,4 @@
-from telethon import TelegramClient
+from telethon import TelegramClient, errors
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from datetime import datetime, timezone
@@ -12,11 +12,9 @@ client = TelegramClient('session_name', api_id, api_hash)
 
 async def get_group_age(group_identifier):
     try:
-        # Check if the identifier is a number (group ID) or a username
-        if group_identifier.startswith('-'):
-            group_identifier = int(group_identifier)  # Convert negative group ID to integer
-        elif group_identifier.isdigit():
-            group_identifier = int(group_identifier)  # Convert positive group ID to integer
+        # Convert the identifier to an integer if it's a valid ID
+        if group_identifier.startswith('-') or group_identifier.isdigit():
+            group_identifier = int(group_identifier)
 
         # Get the group entity using either username or ID
         group = await client.get_entity(group_identifier)
@@ -33,8 +31,12 @@ async def get_group_age(group_identifier):
 
         return (f'The group "{group.title}" was created on {creation_date_str} '
                 f'and is approximately {age_years} years old.')
+    except errors.FloodWait as e:
+        return f"Please wait for {e.seconds} seconds before trying again."
+    except (errors.ChannelPrivate, errors.ChannelInvalid, errors.UserNotParticipant) as e:
+        return "The bot cannot access this group. Please ensure it is a member."
     except Exception as e:
-        return str(e)
+        return f"An error occurred: {str(e)}"
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text('Send /age <group_id_or_username> to check the group age.')
