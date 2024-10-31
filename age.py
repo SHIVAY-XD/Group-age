@@ -12,6 +12,10 @@ client = TelegramClient('session_name', api_id, api_hash)
 
 async def get_group_age(group_identifier):
     try:
+        # Check if the identifier is a number (group ID) or not (username)
+        if group_identifier.isdigit():
+            group_identifier = int(group_identifier)  # Convert to integer if it's a number
+
         # Get the group entity using either username or ID
         group = await client.get_entity(group_identifier)
         creation_date = group.date
@@ -25,8 +29,8 @@ async def get_group_age(group_identifier):
         # Format the creation date
         creation_date_str = creation_date.strftime('%Y-%m-%d %H:%M:%S')
 
-        return (f'Group Name "{group.title}" was created on \n\n Date:{creation_date_str} '
-                f'\n\nand is approximately {age_years} years old.')
+        return (f'The group "{group.title}" was created on {creation_date_str} '
+                f'and is approximately {age_years} years old.')
     except Exception as e:
         return str(e)
 
