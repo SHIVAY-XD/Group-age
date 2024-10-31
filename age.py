@@ -20,7 +20,12 @@ async def get_group_age(group_username):
 
         # Calculate the age in years
         age_years = (current_date - creation_date).days // 365
-        return f'The group "{group.title}" is approximately {age_years} years old.'
+        
+        # Format the creation date
+        creation_date_str = creation_date.strftime('%Y-%m-%d %H:%M:%S')
+
+        return (f'The group "{group.title}" was created on {creation_date_str} '
+                f'and is approximately {age_years} years old.')
     except Exception as e:
         return str(e)
 
