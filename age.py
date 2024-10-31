@@ -10,9 +10,10 @@ bot_token = '6996568724:AAFrjf88-0uUXJumDiuV6CbVuXCJvT-4KbY'
 
 client = TelegramClient('session_name', api_id, api_hash)
 
-async def get_group_age(group_username):
+async def get_group_age(group_identifier):
     try:
-        group = await client.get_entity(group_username)
+        # Get the group entity using either username or ID
+        group = await client.get_entity(group_identifier)
         creation_date = group.date
 
         # Ensure both datetimes are aware
@@ -24,23 +25,23 @@ async def get_group_age(group_username):
         # Format the creation date
         creation_date_str = creation_date.strftime('%Y-%m-%d %H:%M:%S')
 
-        return (f'The group "{group.title}" was created on {creation_date_str} '
-                f'and is approximately {age_years} years old.')
+        return (f'Group Name "{group.title}" was created on \n\n Date:{creation_date_str} '
+                f'\n\nand is approximately {age_years} years old.')
     except Exception as e:
         return str(e)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text('Send /age <group_username> to check the group age.')
+    await update.message.reply_text('Send /age <group_id_or_username> to check the group age.')
 
 async def age(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(context.args) < 1:
-        await update.message.reply_text('Please provide a group username.')
+        await update.message.reply_text('Please provide a group ID or username.')
         return
     
-    group_username = context.args[0]
+    group_identifier = context.args[0]
     
     # Call the async function
-    age_info = await get_group_age(group_username)
+    age_info = await get_group_age(group_identifier)
     await update.message.reply_text(age_info)
 
 def main():
