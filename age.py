@@ -35,6 +35,8 @@ async def get_group_age(group_identifier):
         return f"Please wait for {e.seconds} seconds before trying again."
     except (errors.ChannelPrivate, errors.ChannelInvalid, errors.UserNotParticipant) as e:
         return "The bot cannot access this group. Please ensure it is a member."
+    except ValueError:
+        return "Invalid group ID or username."
     except Exception as e:
         return f"An error occurred: {str(e)}"
 
