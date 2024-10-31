@@ -1,7 +1,7 @@
 from telethon import TelegramClient
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Replace with your own values
 api_id = '12834603'
@@ -14,7 +14,11 @@ async def get_group_age(group_username):
     try:
         group = await client.get_entity(group_username)
         creation_date = group.date
-        current_date = datetime.now()
+
+        # Ensure both datetimes are aware
+        current_date = datetime.now(timezone.utc)
+
+        # Calculate the age in years
         age_years = (current_date - creation_date).days // 365
         return f'The group "{group.title}" is approximately {age_years} years old.'
     except Exception as e:
