@@ -1,6 +1,6 @@
 from telethon import TelegramClient
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from datetime import datetime
 
 # Replace with your own values
@@ -20,29 +20,27 @@ async def get_group_age(group_username):
     except Exception as e:
         return str(e)
 
-def start(update: Update, context: CallbackContext):
-    update.message.reply_text('Send /age <group_username> to check the group age.')
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text('Send /age <group_username> to check the group age.')
 
-def age(update: Update, context: CallbackContext):
+async def age(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(context.args) < 1:
-        update.message.reply_text('Please provide a group username.')
+        await update.message.reply_text('Please provide a group username.')
         return
     
     group_username = context.args[0]
     
     # Call the async function
-    age_info = client.loop.run_until_complete(get_group_age(group_username))
-    update.message.reply_text(age_info)
+    age_info = await get_group_age(group_username)
+    await update.message.reply_text(age_info)
 
 def main():
-    updater = Updater(bot_token)
+    app = ApplicationBuilder().token(bot_token).build()
     
-    dp = updater.dispatcher
-    dp.add_handler(CommandHandler('start', start))
-    dp.add_handler(CommandHandler('age', age))
+    app.add_handler(CommandHandler('start', start))
+    app.add_handler(CommandHandler('age', age))
     
-    updater.start_polling()
-    updater.idle()
+    app.run_polling()
 
 if __name__ == '__main__':
     with client:
