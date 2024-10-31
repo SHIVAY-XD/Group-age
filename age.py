@@ -12,9 +12,11 @@ client = TelegramClient('session_name', api_id, api_hash)
 
 async def get_group_age(group_identifier):
     try:
-        # Check if the identifier is a number (group ID) or not (username)
-        if group_identifier.isdigit():
-            group_identifier = int(group_identifier)  # Convert to integer if it's a number
+        # Check if the identifier is a number (group ID) or a username
+        if group_identifier.startswith('-'):
+            group_identifier = int(group_identifier)  # Convert negative group ID to integer
+        elif group_identifier.isdigit():
+            group_identifier = int(group_identifier)  # Convert positive group ID to integer
 
         # Get the group entity using either username or ID
         group = await client.get_entity(group_identifier)
